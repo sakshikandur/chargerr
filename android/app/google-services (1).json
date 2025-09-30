@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "29680724817",
+    "project_id": "chargerr-88aa8",
+    "storage_bucket": "chargerr-88aa8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:29680724817:android:0d421bc11e8af1ce330170",
+        "android_client_info": {
+          "package_name": "com.example.chargerr"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1xaztE3DYFFAnQ0jzhnPte65ZH10mUVU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

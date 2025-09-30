@@ -1,5 +1,7 @@
-import 'package:chargerr/signup_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'signup_screen.dart';
+import 'Home_screen.dart';
 
 class Loginscreen extends StatefulWidget {
   const Loginscreen({super.key});
@@ -10,24 +12,30 @@ class Loginscreen extends StatefulWidget {
 
 class _LoginscreenState extends State<Loginscreen> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  void _login() {
-    if (_formKey.currentState!.validate()) {
-      String name = _nameController.text.trim();
-      String email = _emailController.text.trim();
-      String password = _passwordController.text.trim();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-      // TODO: Replace this with Firebase or API call
-      if (email == "test@gmail.com" && password == "123456") {
+  Future<void> _login() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        await _auth.signInWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Login Successful ✅")),
         );
-      } else {
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Homescreen()),
+        );
+      } on FirebaseAuthException catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Invalid email or password ❌")),
+          SnackBar(content: Text(e.message ?? "Login Failed ❌")),
         );
       }
     }
@@ -36,107 +44,43 @@ class _LoginscreenState extends State<Loginscreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.green,
+      backgroundColor: Colors.blueGrey.shade100,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
             elevation: 8,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Form(
                 key: _formKey,
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
-                      "Login",
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    const Text("Login", style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 20),
                     TextFormField(
-                      controller: _nameController,
-                      decoration: const InputDecoration(
-                        labelText: "Name",
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.person),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Please enter your name";
-                        }
-                        return null;
-                      },
-                    ),
-                  const SizedBox(height:20),
-                  TextFormField(
                       controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(
-                        labelText: "Email",
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.email),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Please enter email";
-                        }
-                        if (!value.contains("@")) {
-                          return "Enter a valid email";
-                        }
-                        return null;
-                      },
+                      decoration: const InputDecoration(labelText: "Email", prefixIcon: Icon(Icons.email)),
+                      validator: (value) => value!.isEmpty ? "Enter email" : null,
                     ),
-                    const SizedBox(height: 15),
+                    const SizedBox(height: 10),
                     TextFormField(
                       controller: _passwordController,
                       obscureText: true,
-                      decoration: const InputDecoration(
-                        labelText: "Password",
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.lock),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Please enter password";
-                        }
-                        if (value.length < 6) {
-                          return "Password must be at least 6 characters";
-                        }
-                        return null;
-                      },
+                      decoration: const InputDecoration(labelText: "Password", prefixIcon: Icon(Icons.lock)),
+                      validator: (value) => value!.length < 6 ? "Enter valid password" : null,
                     ),
                     const SizedBox(height: 20),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: _login,
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child: const Text(
-                          "Login",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                      ),
+                    ElevatedButton(
+                      onPressed: _login,
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                      child: const Text("Login"),
                     ),
-                    const SizedBox(height: 10),
                     TextButton(
                       onPressed: () {
-                         Navigator.push(
-                        context,
-                       MaterialPageRoute(builder: (context) => const Signupscreen()),
-                       );
-                       },
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => const Signupscreen()));
+                      },
                       child: const Text("Don’t have an account? Sign Up"),
                     ),
                   ],
